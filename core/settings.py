@@ -141,3 +141,36 @@ ALLOWED_HOSTS = [
 
 # Local development
 TENANT_BASE_DOMAIN = "localhost"
+
+
+
+
+# LDAP Authentication
+AUTHENTICATION_BACKENDS = [
+    "django_auth_ldap.backend.LDAPBackend",
+]
+
+# Django is running on WSL/host;
+# OpenLDAP is running in Docker.
+AUTH_LDAP_SERVER_URI = "ldap://127.0.0.1:3890"
+
+# Our LDAP user:
+# uid=rahul,ou=users,dc=example,dc=org
+AUTH_LDAP_USER_DN_TEMPLATE = (
+    "uid=%(user)s,ou=users,dc=example,dc=org"
+)
+
+# Copy LDAP attributes into Django User
+AUTH_LDAP_USER_ATTR_MAP = {
+    "email": "mail",
+    "first_name": "cn",
+}
+
+AUTH_LDAP_ALWAYS_UPDATE_USER = True
+
+# Only authenticate users that already exist
+# in our Django database.
+AUTH_LDAP_NO_NEW_USERS = True
+
+# LDAP onboarding token expiry (10 minutes)
+LDAP_ONBOARDING_TOKEN_MAX_AGE = 600

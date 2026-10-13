@@ -1,0 +1,14 @@
+
+dn: ou=users,dc=example,dc=org
+objectClass: top
+objectClass: organizationalUnit
+ou: users
+
+dn: uid=rahul,ou=users,dc=example,dc=org
+objectClass: top
+objectClass: inetOrgPerson
+cn: Rahul
+sn: User
+uid: rahul
+mail: rahul@example.com
+userPassword: StrongPass123!

@@ -7,13 +7,29 @@ from blog.handlers.create_post_handler import CreatePostHandler
 from blog.handlers.create_user_handler import CreateUserHandler
 
 
-class UserRegistrationSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(
-        write_only=True,
-        min_length=8,
-    )
 
-    tenant_subdomain = serializers.CharField(write_only=True)
+from django.contrib.auth import get_user_model
+from rest_framework import serializers
+
+from blog.handlers.create_user_handler import (
+    CreateUserHandler,
+)
+
+
+class UserRegistrationSerializer(
+    serializers.ModelSerializer
+):
+    onboarding_token = serializers.CharField(
+        write_only=True
+    )
+    tenant_name = serializers.CharField(
+        write_only=True,
+        max_length=100,
+    )
+    tenant_subdomain = serializers.CharField(
+        write_only=True,
+        max_length=50,
+    )
 
     class Meta:
         model = get_user_model()
@@ -21,18 +37,24 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
             "id",
             "username",
             "email",
-            "password",
+            "onboarding_token",
+            "tenant_name",
             "tenant_subdomain",
         ]
-        read_only_fields = ["id"]
+        read_only_fields = [
+            "id",
+            "username",
+            "email",
+        ]
 
     def validate(self, attrs):
-        handler = CreateUserHandler()
-        return handler.validate(attrs)
+        return CreateUserHandler().validate(attrs)
 
     def create(self, validated_data):
-        handler = CreateUserHandler()
-        return handler.create(validated_data)
+        return CreateUserHandler().create(
+            validated_data
+        )
+
 
 
 
@@ -88,3 +110,27 @@ class LoginSerializer(serializers.Serializer):
             "refresh": str(refresh),
             "access": str(refresh.access_token),
         }
+
+
+
+
+
+
+from blog.handlers.ldap_login_handler import (
+    LDAPLoginHandler,
+)
+
+
+class LDAPLoginSerializer(serializers.Serializer):
+    username = serializers.CharField()
+    password = serializers.CharField(
+        write_only=True
+    )
+
+    def validate(self, attrs):
+        return LDAPLoginHandler().validate(attrs)
+
+    def create(self, validated_data):
+        return LDAPLoginHandler().create(
+            validated_data
+        )
